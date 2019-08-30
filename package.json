@@ -1,0 +1,27 @@
+{
+  "name": "ast",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@babel/core": "^7.5.5",
+    "@babel/generator": "^7.5.5",
+    "@babel/template": "^7.4.4",
+    "@babel/traverse": "^7.5.5",
+    "@babel/types": "^7.5.5",
+    "babylon": "^7.0.0-beta.34",
+    "htmlparser2": "^4.0.0",
+    "recast": "^0.18.2",
+    "vue-template-compiler": "^2.6.10"
+  },
+  "dependencies": {
+    "@babel/parser": "^7.5.5",
+    "babel-traverse": "^6.26.0"
+  }
+}
