@@ -38,6 +38,21 @@ import eztalkApi from 'm/api/eztalk'
 import config from 'm/config'
 
 @Component({
+  name: 'qd-text-spot-message',
+  components: {
+    QdMessage,
+    QdImageSpot
+  },
+  props: {
+    own: {
+      type: Boolean,
+      default: false
+    },
+    zoomImg: {
+      type: [Boolean, Number],
+      default: false
+    }
+  },
   mixins: [routeMixin],
   watch: {
     'readModal.visible': function (visible) {
@@ -51,6 +66,11 @@ import config from 'm/config'
 export default class Login extends Vue {
   phone = '我是中文222'
   code = '22'
+  container = {
+    width: 0,
+    height: 0
+  }
+
 
   get count () {
     return this.countDown
@@ -67,7 +87,7 @@ export default class Login extends Vue {
   mounted () {
     console.log(1)
   }
-
+  @log()
   getVerifycode () {}
 
   login () {}
@@ -116,6 +136,7 @@ let definedLifeCycle = [
 ]
 
 let computedArr = []
+let componentsArr
 
 traverse(ast, {
   ClassProperty (p) { // 属性获取
@@ -125,14 +146,29 @@ traverse(ast, {
     if (definedLifeCycle.includes(p.node.key.name)) { // 生命周期方法
       lifeCycle.push(t.objectMethod(p.node.kind, p.node.key, p.node.params, p.node.body))
     } else if (p.node.kind === 'get') { // 获取computed
-      computedArr.push(t.objectMethod(p.node.kind, p.node.key, p.node.params, p.node.body))
+      computedArr.push(t.objectMethod('method', p.node.key, p.node.params, p.node.body))
     } else {
       methodsArr.push(t.objectMethod(p.node.kind, p.node.key, p.node.params, p.node.body))
     }
-
   },
   ImportDeclaration (p) {
-    importArr.push(t.importDeclaration(p.node.specifiers, p.node.source))
+    let node = p.node
+    if (node.specifiers.length === 1 
+      && (
+        (node.specifiers[0].local.name === 'Vue' && node.source.value === 'vue')
+        || (node.specifiers[0].local.name === 'Component' && node.source.value === 'vue-class-component')
+      )) {
+        // console.log('vue')
+    } else {
+      importArr.push(t.importDeclaration(node.specifiers, node.source))
+    }
+    
+  },
+  Decorator (p) {
+    let expression = p.node.expression
+    if (expression.callee.name === 'Component') {
+      componentsArr = expression.arguments[0].properties
+    }
   }
 })
 // let sourcecode = generator(ast).code
@@ -142,24 +178,22 @@ let data = t.objectMethod('method', t.identifier('data'), [], t.blockStatement([
 ]))
 
 let methods = t.objectProperty(t.identifier('methods'), t.objectExpression(methodsArr))
-
 let computed = t.objectProperty(t.identifier('computed'), t.objectExpression(computedArr))
 
 
 let ExportDefaultDeclaration = t.exportDefaultDeclaration(
-  t.objectExpression([data, methods, ...lifeCycle, computed])
+  t.objectExpression([...componentsArr, ...lifeCycle, data, computed, methods])
 )
 
 
+// 构造正常结构
 const code = ''
 const ast2 = parser.parse(code)
-
 ast2.program.body.push(...importArr)
-console.log('ExportDefaultDeclaration', ExportDefaultDeclaration)
 ast2.program.body.push(ExportDefaultDeclaration)
 
 
 
 const output = generate(ast2, {}, code)
 
-console.log('出来一', output.code)
+console.log(output.code)
