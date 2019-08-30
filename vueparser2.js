@@ -66,6 +66,7 @@ import config from 'm/config'
 export default class Login extends Vue {
   phone = '我是中文222'
   code = '22'
+  helloMsg = 'Hello, ' + this.phone
   container = {
     width: 0,
     height: 0
@@ -136,7 +137,7 @@ let definedLifeCycle = [
 ]
 
 let computedArr = []
-let componentsArr
+let componentsArr = null
 
 traverse(ast, {
   ClassProperty (p) { // 属性获取
@@ -181,8 +182,13 @@ let methods = t.objectProperty(t.identifier('methods'), t.objectExpression(metho
 let computed = t.objectProperty(t.identifier('computed'), t.objectExpression(computedArr))
 
 
+let reconstructor = [...lifeCycle, data, computed, methods]
+if (componentsArr) {
+  reconstructor.unshift(...componentsArr)
+}
+
 let ExportDefaultDeclaration = t.exportDefaultDeclaration(
-  t.objectExpression([...componentsArr, ...lifeCycle, data, computed, methods])
+  t.objectExpression(reconstructor)
 )
 
 
