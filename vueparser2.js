@@ -202,4 +202,22 @@ ast2.program.body.push(ExportDefaultDeclaration)
 
 const output = generate(ast2, {}, code)
 
-console.log(output.code)
+// console.log(output.code)
+// console.log(vuecontent.styles[0])
+// console.log(vuecontent.template.content)
+const allTpl = `
+<template>
+  ${vuecontent.template.content}
+</template>
+
+<script>
+  
+  ${output.code}
+</script>
+
+<style lang="less" scoped>
+  ${vuecontent.styles[0].content}
+</style>
+`
+
+console.log(allTpl)
