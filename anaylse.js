@@ -17,7 +17,6 @@ traverse(ast, {
   //   console.log(' g把m过', path)
   // },
   enter(path) {
-    console.log('中文啊', path)
     if (path.isIdentifier({ name: "n" })) {
       path.node.name = "x";
     }

@@ -49,7 +49,7 @@ function transform (source) {
     },
     ImportDeclaration (p) {
       let node = p.node
-      if (node.specifiers.length === 1 
+      if (node.specifiers.length === 1
         && (
           (node.specifiers[0].local.name === 'Vue' && node.source.value === 'vue')
           || (node.specifiers[0].local.name === 'Component' && node.source.value === 'vue-class-component')
@@ -90,9 +90,7 @@ function transform (source) {
   const ast2 = parser.parse(code)
   ast2.program.body.push(...importArr)
   ast2.program.body.push(ExportDefaultDeclaration)
-
   const output = generate(ast2, {}, code)
-  
   const allTpl = `
     <template>
       ${vuecontent.template.content}
