@@ -1,9 +1,4 @@
-const t = require('@babel/types')
-const parser = require('@babel/parser')
-const generate = require('@babel/generator').default
-const traverse = require('@babel/traverse').default
-const getTranslateKey = require('../anaylse-html/getTranslateKey')
-
+ const ScriptParser = require('./ScriptParser')
 const code = `
 import { mapState, mapMutations } from 'vuex'
   import debounce from 'lodash/debounce'
@@ -426,32 +421,6 @@ import { mapState, mapMutations } from 'vuex'
     }
   }
 `
-let ast = parser.parse(code, {
-  sourceType: 'module',
-  plugins: [
-    'classProperties',
-    'methodDefinition',
-    'decorators-legacy'
-  ]
-})
+ let scriptTpl = new ScriptParser(code)
 
-
-traverse(ast, {
-  StringLiteral (path) {
-    const value = path.node.value
-    const regText = new RegExp('([\u4E00-\u9FA5\uF900-\uFA2D]+)', 'gi')
-    if (regText.test(value)) {
-      let callExpressionss = t.callExpression(
-        t.memberExpression(t.thisExpression(), t.identifier('$t')),
-        [path.node]
-      )
-      path.replaceWith(callExpressionss)
-      path.skip()
-    }
-  }
-})
-
-const output = generate(ast, {}).code
-
-console.log(output)
-console.log('翻译', getTranslateKey(output))
+console.log(scriptTpl.transformCode())

@@ -1,58 +1,6 @@
-const htmlparser = require('htmlparser2')
-const templateConverter = require('./replaceHtml')
+const templateConverter = require('./templateConverter')
 const getTranslateKey = require('./getTranslateKey')
-
-class TemplateParser {
-  /**
-   * HTML文本转AST方法
-   * @param scriptText
-   * @returns {Promise}
-   */
-  parse(scriptText){
-    return new Promise((resolve, reject) => {
-      //先初始化一个domHandler
-      const handler = new htmlparser.DomHandler((error, dom)=>{
-        if (error) {
-          reject(error);
-        } else {
-          //在回调里拿到AST对象
-          resolve(dom);
-        }
-      });
-      //再初始化一个解析器
-      const parser = new htmlparser.Parser(handler);
-      //再通过write方法进行解析
-      parser.write(scriptText);
-      parser.end();
-    });
-  }
-  /**
-   * AST转文本方法
-   * @param ast
-   * @returns {string}
-   */
-  astToString (ast) {
-    let str = '';
-    ast.forEach(item => {
-      if (item.type === 'text') {
-        str += item.data;
-      } else if (item.type === 'tag') {
-        str += '<' + item.name;
-        if (item.attribs) {
-          Object.keys(item.attribs).forEach(attr => {
-            str += ` ${attr}="${item.attribs[attr]}"`;
-          });
-        }
-        str += '>';
-        if (item.children && item.children.length) {
-          str += this.astToString(item.children);
-        }
-        str += `</${item.name}>`;
-      }
-    });
-    return str;
-  }
-}
+const TemplateParser = require('./TemplateParser')
 
 const tpl = `
   <div id="app">
@@ -176,7 +124,6 @@ const tpl = `
 
 
 const parseHtml = new TemplateParser()
-// const res = (async() => await parseHtml.parse(tpl))()
 
 parseHtml.parse(tpl).then(astHtml => {
   let originTpl = parseHtml.astToString(astHtml)
@@ -186,4 +133,3 @@ parseHtml.parse(tpl).then(astHtml => {
   console.log('之后', outputTpl)
   console.log('解析出来', getTranslateKey(outputTpl))
 })
-
