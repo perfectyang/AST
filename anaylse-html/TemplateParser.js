@@ -87,7 +87,7 @@ class TemplateParser {
       }
       // 递归
       if (node.children) {
-        templateConverter(node.children)
+        this.templateConverter(node.children)
       }
     }
     return ast

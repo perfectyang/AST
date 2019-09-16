@@ -8,6 +8,7 @@ const tpl = `
     <span>this is for test</span>
     <div :value='"中文"'>要这里aaa</div>
     <div :value="'中文aa'" placeholder="请选择或者创建大po号">要这里aaa</div>
+    <div :test="$t('我是翻译过的')"></div>
   </div>
 `
 
