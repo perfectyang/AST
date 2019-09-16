@@ -2,7 +2,6 @@ const getTranslateKey = require('./getTranslateKey')
 const fs = require('fs-extra')
 const path = require('path')
 const tsAll = require('./fy')
-console.log('出为', tsAll)
 const resolve = f => path.resolve(process.cwd(), f)
 class Genratets {
   constructor ({
@@ -29,7 +28,6 @@ class Genratets {
         this.__enCache[result.key] = result.en
         this.__gbCache[result.key] = result.gb
       })
-      console.log('所有要翻译的字段', translateText)
       this.writeTranslateKeyFile()
       callback()
     })
@@ -42,9 +40,9 @@ class Genratets {
       let content
       if (fileName === 'zh') { // 中文
         content = JSON.stringify(this.__zhCache, null, 2)
-      } else if (fileName === 'gb') {
+      } else if (fileName === 'gb') { // 繁体
         content = JSON.stringify(this.__gbCache, null, 2)
-      } else if (fileName === 'en') {
+      } else if (fileName === 'en') { // 英文
         content = JSON.stringify(this.__enCache, null, 2)
       }
       if (fs.existsSync(file)) {
@@ -59,7 +57,6 @@ class Genratets {
   apply(compiler) {
     const afterEmit = (compilation, callback = () => {}) => {
       let chunks = compilation.chunks
-      console.log('-----chunks----', chunks)
       let files = []
       chunks.forEach(chunk => {
         files = files.concat(chunk.files)
@@ -70,21 +67,11 @@ class Genratets {
         if (asset) {
           let content = asset.source()
           let getKey = Object.keys(getTranslateKey(content))
-          console.log('获取', getKey)
           translateText = translateText.concat(getKey)
         }
       })
-      console.log('出来的', translateText)
       this.generateTranslateKeyFile(translateText, callback)
-      // console.log('所有要翻译的字段', translateText)
-      // console.log()
-      // console.log()
-      // console.log('i18n 配置生成完成, 请查看')
-      // console.log()
-      // // callback()
     }
-
-
     compiler.hooks.afterEmit.tapAsync('Genratets', afterEmit)
   }
 }
