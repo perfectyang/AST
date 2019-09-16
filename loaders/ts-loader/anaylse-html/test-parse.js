@@ -2,6 +2,7 @@ const getTranslateKey = require('./getTranslateKey')
 const TemplateParser = require('./TemplateParser')
 
 
+
 // const tpl = `
 // <el-form class="project-approval-info" v-loading="loading" ref="form" :model="form" :rules="rules" label-width="170px">
 //     <el-row :gutter="20">
@@ -114,7 +115,7 @@ const TemplateParser = require('./TemplateParser')
 
 const tpl = `
   <div id="app">
-    <HelloWorld :title="$t('我一半中文') + msg + '中文'" />
+    <HelloWorld msg="中文" />
     <div>顺在在在</div>
     <span>this is for test</span>
     <div :value='"中文"'>{{$t('要这里aaa')}}</div>
@@ -133,6 +134,5 @@ parseHtml.parse(tpl).then(astHtml => {
   let changeAstTpl = parseHtml.templateConverter(astHtml)
   let outputTpl = parseHtml.astToString(changeAstTpl)
   console.log('之后', outputTpl)
-  let tsSourceCode = getTranslateKey(outputTpl)
-  console.log('解析出来', tsSourceCode)
+  console.log('解析出来', getTranslateKey(outputTpl))
 })

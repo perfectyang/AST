@@ -4,6 +4,7 @@ const generate = require('@babel/generator').default
 const traverse = require('@babel/traverse').default
 const getTranslateKey = require('../anaylse-html/getTranslateKey')
 
+
 class ScriptParser {
   constructor (sourceCode) {
     this.ast = parser.parse(sourceCode, {
@@ -42,7 +43,6 @@ class ScriptParser {
             let pathParent = path.findParent((path) => path.isTemplateLiteral())
             let chineseText = raw.filter(text => regText.test(text))
             let chineseArr = chineseText.map(chtxt => {
-              console.log('中文转义吗', chtxt)
               let callExpressionss = t.callExpression(
                 t.memberExpression(t.thisExpression(), t.identifier('$t')),
                 [t.stringLiteral(chtxt)]
@@ -65,11 +65,10 @@ class ScriptParser {
       }
     })
     let output = generate(this.ast, {
-      "jsescOption": {
-        "minimal": true
+      jsescOption: {
+        'minimal': true // 防止转义中文
       }
     }).code
-    console.log('翻译', getTranslateKey(output))
     return output
   }
 }
