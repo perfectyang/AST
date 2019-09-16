@@ -1,4 +1,3 @@
-const templateConverter = require('./templateConverter')
 const getTranslateKey = require('./getTranslateKey')
 const TemplateParser = require('./TemplateParser')
 
@@ -128,7 +127,7 @@ const parseHtml = new TemplateParser()
 parseHtml.parse(tpl).then(astHtml => {
   let originTpl = parseHtml.astToString(astHtml)
   console.log('之前', originTpl)
-  let changeAstTpl = templateConverter(astHtml)
+  let changeAstTpl = parseHtml.templateConverter(astHtml)
   let outputTpl = parseHtml.astToString(changeAstTpl)
   console.log('之后', outputTpl)
   console.log('解析出来', getTranslateKey(outputTpl))
