@@ -57,6 +57,8 @@ class TemplateParser {
   templateConverter (ast) {
     // 中文正则
     const regText = new RegExp('([\u4E00-\u9FA5\uF900-\uFA2D]+)', 'gi')
+    const isTranslateReg = /\$t/gi
+
     for (let i = 0; i < ast.length; i++) {
       let node = ast[i]
       if (node.type === 'tag') { // div span 这种标签
@@ -64,7 +66,7 @@ class TemplateParser {
         let attrs = {}
         for (let k in node.attribs) {
           let value = node.attribs[k]
-          if (regText.test(value)) {
+          if (regText.test(value) && !isTranslateReg.test(value)) {
             // 重置一下原来的变量
             k = k.replace(/:/gi, '')
             value = value.replace(/"|'/gi, '')
@@ -77,7 +79,7 @@ class TemplateParser {
       }
       // 标签里面的内容
       if (node.type === 'text' && node.data) {
-        if (regText.test(node.data)) {
+        if (regText.test(node.data) && !isTranslateReg.test(node.data)) {
           let tmdata = node.data.replace(regText, ($0) => {
             let tem = `{{$t('${$0}')}}`
             return tem

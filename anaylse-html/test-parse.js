@@ -1,16 +1,7 @@
 const getTranslateKey = require('./getTranslateKey')
 const TemplateParser = require('./TemplateParser')
 
-const tpl = `
-  <div id="app">
-    <HelloWorld msg="中文" />
-    <div>顺在在在</div>
-    <span>this is for test</span>
-    <div :value='"中文"'>要这里aaa</div>
-    <div :value="'中文aa'" placeholder="请选择或者创建大po号">要这里aaa</div>
-    <div :test="$t('我是翻译过的')"></div>
-  </div>
-`
+
 
 // const tpl = `
 // <el-form class="project-approval-info" v-loading="loading" ref="form" :model="form" :rules="rules" label-width="170px">
@@ -121,6 +112,18 @@ const tpl = `
 //   </el-form>
 // </template>
 // `
+
+const tpl = `
+  <div id="app">
+    <HelloWorld msg="中文" />
+    <div>顺在在在</div>
+    <span>this is for test</span>
+    <div :value='"中文"'>{{$t('要这里aaa')}}</div>
+    <div :value="'中文aa'" placeholder="请选择或者创建大po号">要这里aaa</div>
+    <div :test="$t('我是翻译过的')"></div>
+  </div>
+`
+
 
 
 const parseHtml = new TemplateParser()
