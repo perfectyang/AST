@@ -1,7 +1,4 @@
-const getTranslateKey = require('./getTranslateKey')
 const TemplateParser = require('./TemplateParser')
-
-
 
 // const tpl = `
 // <el-form class="project-approval-info" v-loading="loading" ref="form" :model="form" :rules="rules" label-width="170px">
@@ -114,25 +111,55 @@ const TemplateParser = require('./TemplateParser')
 // `
 
 const tpl = `
-  <div id="app">
-    <HelloWorld msg="中文" />
-    <div>顺在在在</div>
-    <span>this is for test</span>
-    <div :value='"中文"'>{{$t('要这里aaa')}}</div>
-    <div :value="'中文aa'" placeholder="请选择或者创建大po号">要这里aaa</div>
-    <div :test="$t('我是翻译过的')"></div>
-  </div>
+
+  {{option ? "数据源" + $t(option.txt):'不是数a据源' + $t('中文')+'aabbbccc'}}: ----- {{
+    option ?option:$t('不是数据源OP')
+  }}: --- 中目言王言a ---asdfasdf----- 中文asdfasfa中王言言王
+  {{'列表内容'+o}}
+  +{{handleText}}所有
+  {{ {finish: '正常结束页', suspend: '正常结束页'}[key] }}
+  {{asdfasdfaf---asdfasdfasdf---asdfasdf}}
 `
+// const tpl = `
+//    <div :v-show="a?'有':'没有'"></div>
+//    <div :title="(isEdit ? '编辑' : '新建') + '客户'"></div>
+// `
 
-
-
-const parseHtml = new TemplateParser()
-
-parseHtml.parse(tpl).then(astHtml => {
-  let originTpl = parseHtml.astToString(astHtml)
-  console.log('之前', originTpl)
-  let changeAstTpl = parseHtml.templateConverter(astHtml)
-  let outputTpl = parseHtml.astToString(changeAstTpl)
-  console.log('之后', outputTpl)
-  console.log('解析出来', getTranslateKey(outputTpl))
+const re2 = /\$t\(.*?\)/gi // --- 匹配 $t('中文')  $t(option.t)
+const re4 = /{{([^}}]+)}}/gi
+const re6 = /[\u4e00-\u9fa5]/gi
+const re8 = /[\u4e00-\u9fa5]+[a-zA-Z0-9]*[\u4e00-\u9fa5]*/gi
+const re9 = /\$t\(.*?\)|(['"])[\u4e00-\u9fa5a-zA-Z0-9]+[a-zA-Z0-9\s]*[\u4e00-\u9fa5a-zA-Z0-9\s]*\1/gi
+const temStoreArr = []
+let idx = 0
+let str = tpl.replace(re4, ($0) => {
+  let newStr = $0.replace(re9, (first) => {
+    if (!re2.test(first) && re6.test(first)) {
+      first = `$t(${first})`
+    }
+    return first
+  })
+  temStoreArr.push(newStr)
+  let placer = 'placeholder-' + idx
+  idx += 1
+  return placer
 })
+
+str = str.replace(re8, ($1) => {
+  return `{{$t('${$1}')}}`
+})
+
+temStoreArr.forEach((el, i) => {
+  str = str.replace(new RegExp('placeholder-' + i, 'gi'), el)
+})
+
+console.log('aaaa', str)
+
+// const parseHtml = new TemplateParser()
+// parseHtml.parse(tpl).then(astHtml => {
+//   let originTpl = parseHtml.astToString(astHtml)
+//   console.log('之前', originTpl)
+//   let changeAstTpl = parseHtml.templateConverter(astHtml)
+//   let outputTpl = parseHtml.astToString(changeAstTpl)
+//   console.log('之后', outputTpl)
+// })

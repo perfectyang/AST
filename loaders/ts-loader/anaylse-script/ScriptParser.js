@@ -2,8 +2,6 @@ const t = require('@babel/types')
 const parser = require('@babel/parser')
 const generate = require('@babel/generator').default
 const traverse = require('@babel/traverse').default
-const getTranslateKey = require('../anaylse-html/getTranslateKey')
-
 
 class ScriptParser {
   constructor (sourceCode) {
@@ -21,7 +19,12 @@ class ScriptParser {
       StringLiteral (path) {
         let pathParent = path.findParent((path) => path.isCallExpression())
         // 判断当前节点是否已经翻译过
-        if (!pathParent || (pathParent && pathParent.node.callee && pathParent.node.callee.property.name !== '$t')) {
+        if (!pathParent || (
+            pathParent &&
+            pathParent.node.callee &&
+            (pathParent.node.callee.property && pathParent.node.callee.property.name !== '$t') &&
+            (pathParent.node.callee.object && pathParent.node.callee.object.name !== 'console')
+          )) {
           const value = path.node.value
           const regText = new RegExp('([\u4E00-\u9FA5\uF900-\uFA2D]+)', 'gi')
           if (regText.test(value)) {
@@ -56,7 +59,10 @@ class ScriptParser {
             }
             let notchineseText = raw.filter(text => !regText.test(text))
             let templateElement = notchineseText.map(txt => {
-               return t.templateElement({raw: txt, cooked: txt}, true)
+              return t.templateElement({
+                raw: txt,
+                cooked: txt
+              }, true)
             })
             path.replaceWithMultiple(templateElement)
             path.stop()
