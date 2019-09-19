@@ -14,11 +14,18 @@ class TemplateParser {
           reject(error)
         } else {
           // 在回调里拿到AST对象
+          // console.log('出来来的dom', dom)
           resolve(dom)
         }
       })
-      //再初始化一个解析器
-      const parser = new htmlparser.Parser(handler)
+      // 再初始化一个解析器
+      const parser = new htmlparser.Parser(handler, {
+        xmlMode: true,
+        // 将所有标签小写，并不需要，设置为false, 如果xmlMode禁用，则默认为true。所以xmlMode为true。
+        lowerCaseTags: false,
+        // 自动识别关闭标签，并关闭，如<image /> ==> <image></image>,不加的话，会解析异常，导致关闭标签会出现在最后面
+        recognizeSelfClosing: true
+      })
       // 再通过write方法进行解析
       parser.write(scriptText)
       parser.end()
@@ -52,13 +59,13 @@ class TemplateParser {
   }
 
   handleTag (tpl) {
-    const re = /\$t\(.*?\)|(['"])[\u4e00-\u9fa5a-zA-Z0-9]+[a-zA-Z0-9\s]*[\u4e00-\u9fa5a-zA-Z0-9\s]*\1/gi
-    const re2 = /\$t\(.*?\)/gi // --- 匹配 $t('中文')  $t(option.t) '中文'
+    const re = /\$t\(.*?\)|(['"])[\u4E00-\u9FA5\uF900-\uFA2Da-zA-Z0-9]+[a-zA-Z0-9\s]*[\u4E00-\u9FA5\uF900-\uFA2Da-zA-Z0-9\s]*\1/gi
+    const re2 = /\$t\(.*?\)/i // --- 匹配 $t('中文')  $t(option.t) '中文'
     const re3 = /`(.*?)`/g
-    const re4 = /\$t\(.*?\)|(['"])?[\u4e00-\u9fa5a-zA-Z0-9]+[a-zA-Z0-9\s]*[\u4e00-\u9fa5a-zA-Z0-9\s]*\1/gi
-    const re5 = /([\u4E00-\u9FA5\uF900-\uFA2D]+)/gi
+    const re4 = /\$t\(.*?\)|(['"])?[\u4E00-\u9FA5\uF900-\uFA2Da-zA-Z0-9]+[a-zA-Z0-9\s]*[\u4E00-\u9FA5\uF900-\uFA2Da-zA-Z0-9\s]*\1/gi
+    const re5 = /([\u4E00-\u9FA5\uF900-\uFA2D]+)/i
     const re6 = /\${(.*?)}/g // --- ${xxxxx}
-    const re7 = /(['"])+[\u4e00-\u9fa5a-zA-Z0-9]+[a-zA-Z0-9\s]*[\u4e00-\u9fa5a-zA-Z0-9\s]*\1/g
+    const re7 = /(['"])+[\u4E00-\u9FA5\uF900-\uFA2Da-zA-Z0-9]+[a-zA-Z0-9\s]*[\u4E00-\u9FA5\uF900-\uFA2Da-zA-Z0-9\s]*\1/i
     let temArr = []
     let idx = 0
     let str = tpl.replace(re3, ($0) => {
@@ -82,7 +89,7 @@ class TemplateParser {
         }
       })
       temArr.push($0)
-      let tem = 'placeholder-' + idx
+      let tem = 'perfectyang2' + idx
       idx += 1
       return tem
     })
@@ -94,16 +101,16 @@ class TemplateParser {
       }
     })
     temArr.forEach((el, idx) => {
-      str = str.replace(new RegExp('placeholder-' + idx, 'gi'), el)
+      str = str.replace(new RegExp('perfectyang2' + idx, 'gi'), el)
     })
     return str
   }
   handleText (tpl) {
-    const re2 = /\$t\(.*?\)/gi // --- 匹配 $t('中文')  $t(option.t)
-    const re4 = /{{([^}}]+)}}/gi
-    const re6 = /[\u4e00-\u9fa5]/gi
-    const re8 = /[\u4e00-\u9fa5]+[a-zA-Z0-9]*[\u4e00-\u9fa5]*/gi
-    const re9 = /\$t\(.*?\)|(['"])[\u4e00-\u9fa5a-zA-Z0-9]+[a-zA-Z0-9\s]*[\u4e00-\u9fa5a-zA-Z0-9\s]*\1/gi
+    const re2 = /\$t\(.*?\)/i // --- 匹配 $t('中文')  $t(option.t)
+    const re4 = /{{(.*?)}}/gi
+    const re6 = /[\u4E00-\u9FA5\uF900-\uFA2D]+/i
+    const re8 = /[\u4E00-\u9FA5\uF900-\uFA2D]+[a-zA-Z0-9]*[\u4E00-\u9FA5\uF900-\uFA2D]*/gi
+    const re9 = /\$t\(.*?\)|(['"])?[\u4E00-\u9FA5\uF900-\uFA2Da-zA-Z0-9]+[a-zA-Z0-9\s]*[\u4E00-\u9FA5\uF900-\uFA2Da-zA-Z0-9\s]*\1/gi
     const temStoreArr = []
     let idx = 0
     let str = tpl.replace(re4, ($0) => {
@@ -114,7 +121,7 @@ class TemplateParser {
         return first
       })
       temStoreArr.push(newStr)
-      let placer = 'placeholder-' + idx
+      let placer = '&&perfectyang&&' + idx
       idx += 1
       return placer
     })
@@ -122,7 +129,7 @@ class TemplateParser {
       return `{{$t('${$1}')}}`
     })
     temStoreArr.forEach((el, i) => {
-      str = str.replace(new RegExp('placeholder-' + i, 'gi'), el)
+      str = str.replace(new RegExp('&&perfectyang&&' + i, 'gi'), el)
     })
     return str
   }
@@ -131,7 +138,6 @@ class TemplateParser {
    * @param ast
    */
   templateConverter (ast) {
-    const re = /[\u4e00-\u9fa5]+/gi
     for (let i = 0; i < ast.length; i++) {
       let node = ast[i]
       if (node.type === 'tag') { // div span 这种标签
@@ -139,10 +145,10 @@ class TemplateParser {
         let attrs = {}
         for (let k in node.attribs) {
           let value = node.attribs[k]
-          if (/(:|v-show|v-if)/gi.test(k)) { // 变量
+          if (/(:|v-|@)/gi.test(k)) { // 变量
             attrs[k] = this.handleTag(value)
           } else { // 不是变量
-            if (re.test(value)) {
+            if (/[\u4E00-\u9FA5\uF900-\uFA2D]+/i.test(value)) {
               attrs[`:${k}`] = `$t('${value}')`
             } else {
               attrs[k] = value

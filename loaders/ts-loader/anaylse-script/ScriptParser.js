@@ -26,8 +26,9 @@ class ScriptParser {
             (pathParent.node.callee.object && pathParent.node.callee.object.name !== 'console')
           )) {
           const value = path.node.value
-          const regText = new RegExp('([\u4E00-\u9FA5\uF900-\uFA2D]+)', 'gi')
+          const regText = new RegExp('([\u4E00-\u9FA5\uF900-\uFA2D]+)', 'i')
           if (regText.test(value)) {
+            console.log('pathpath', path.node)
             let callExpressionss = t.callExpression(
               t.memberExpression(t.thisExpression(), t.identifier('$t')),
               [path.node]
@@ -40,7 +41,7 @@ class ScriptParser {
       TemplateElement (path) {
         let curNode = path.node
         if (curNode.value.raw.trim()) {
-          const regText = new RegExp('([\u4E00-\u9FA5\uF900-\uFA2D]+)', 'gi')
+          const regText = new RegExp('([\u4E00-\u9FA5\uF900-\uFA2D]+)', 'i')
           let raw = curNode.value.raw.split(regText)
           if (raw.length) {
             let pathParent = path.findParent((path) => path.isTemplateLiteral())
